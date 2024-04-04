@@ -65,8 +65,8 @@ else:
             
             left_df_styled, right_df_styled = compare_dataframes(left_df, right_df)
             
-            left_file_path = "C:\Projects\ABTSolute\Guest List Comparison\RL_hotel.csv"  # Define the file path for the left DataFrame
-            right_file_path = "C:\Projects\ABTSolute\Guest List Comparison\RL_abtsolute.csv"  # Define the file path for the right DataFrame
+            left_file_path = "RL_hotel.csv"  # Define the file path for the left DataFrame
+            right_file_path = "RL_abtsolute.csv"  # Define the file path for the right DataFrame
 
             if left_df_styled is not None:
                 st.markdown("**Hotel Rooming List Differences Highlighted**")
