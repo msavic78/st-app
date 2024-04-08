@@ -12,23 +12,13 @@ from data_comparison import compare_dataframes
 from data_editing import update_df_in_session_only
 
 
-st.session_state['logged_in'] = True
-st.session_state['user_type'] = "Admin"
-st.session_state['Edited'] = False
-
 # Initialize session state
 if 'logged_in' not in st.session_state:
-    # st.session_state['logged_in'] = False
-    # st.session_state['user_type'] = None  # Initialize user type in session state
-
-    st.session_state['logged_in'] = True
-    st.session_state['user_type'] = "Admin"  # Initialize user type in session state
-
- 
-
+    st.session_state['logged_in'] = False
+    st.session_state['user_type'] = None  # Initialize user type in session state
 
 # Show login form if not logged in, otherwise show the main application
-if 'logged_in' not in st.session_state: # correct syntax for NOT
+if not st.session_state['logged_in']: # correct syntax for NOT
     show_login_form()
 else:
 
@@ -38,7 +28,11 @@ else:
         from data_loading import load_csv
 
         # Adjusted Main App to conditionally display tables
-        st.title("RoomSync - Rooming List Comparator")
+        title=f"<h3 style='color:#3C8595;'>ABTS <span style='color:#333333;'>RoomSync</span></h3>"
+        st.markdown(title, unsafe_allow_html=True)
+        
+        rlv = f"<p style='font-size:20px; margin-top:-20px; margin-bottom:-10px; padding:0px;'>Rooming List Validation</p><hr>"
+        st.markdown(rlv, unsafe_allow_html=True)
 
         # Create placeholders for the original dataframes
         placeholder_left = st.empty()
@@ -54,8 +48,30 @@ else:
          # Load Data (data_loading.py)
         from data_loading import load_csv
 
-        # Adjusted Main App to conditionally display tables
-        st.title("RoomSync - Rooming List Comparator")
+        header = st.container()
+        title=f"<h3 style='color:#3C8595;'>ABTS <span style='color:#333333;'>RoomSync</span></h3>"
+        header.write(title, unsafe_allow_html=True)
+        rlv = f"<p style='font-size:20px; margin-top:-20px; margin-bottom:-10px; padding:0px;'>Rooming List Validation</p>"
+        header.write(rlv, unsafe_allow_html=True)
+        header.write("""<div class='fixed-header'/>""", unsafe_allow_html=True)
+
+        ### Custom CSS for the sticky header
+        st.markdown(
+            """
+        <style>
+            div[data-testid="stVerticalBlock"] div:has(div.fixed-header) {
+                position: sticky;
+                top: 2.875rem;
+                background-color: white;
+                z-index: 999;
+            }
+            .fixed-header {
+                border-bottom: 1px solid #cccccc;
+            }
+        </style>
+            """,
+            unsafe_allow_html=True
+        )
 
         # Create placeholders for the original dataframes
         placeholder_left = st.empty()
@@ -82,14 +98,16 @@ else:
             right_file_path = "C:\Projects\ABTSolute\Guest List Comparison\RL_abtsolute.csv"  # Define the file path for the right DataFrame
 
             if left_df_styled is not None:
-                st.markdown("**Hotel Rooming List Differences Highlighted**")
+                rl_hotel = f"<hr><p style='color:Red; font-size:20px; margin-bottom:0px; padding:0px;'>Hotel Rooming List<p><span style='color:#999999;'>Differences Highlighted in yellow</span>"
+                st.markdown(rl_hotel, unsafe_allow_html=True)
                 st.dataframe(left_df_styled, use_container_width=True)
                 # Insert the editing functionality here for the left table
                 #update_df_in_session_only(left_df, "left", left_file_path)
                 
                 
             if right_df_styled is not None:
-                st.markdown("**ABTSolute Rooming List Differences Highlighted**")
+                rl_ABTS = f"<p style='color:Blue; font-size:20px; margin-bottom:0px; padding:0px;'>ABTSolute Rooming List<p><span style='color:#999999;'>Differences Highlighted in yellow</span>"
+                st.markdown(rl_ABTS, unsafe_allow_html=True)
                 st.dataframe(right_df_styled, use_container_width=True)
                 # Insert the editing functionality here for the right table
                 # update_df_in_session_only(right_df, "right", right_file_path)

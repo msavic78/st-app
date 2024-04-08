@@ -14,7 +14,11 @@ def show_login_form():
     with st.form(key='login_form'):
         
         # Adjusted Main App to conditionally display tables
-        st.title("RoomSync - Rooming List Comparator")
+        title=f"<h3 style='color:#3C8595;'>ABTS <span style='color:#333333;'>RoomSync</span></h3>"
+        st.markdown(title, unsafe_allow_html=True)
+        
+        rlv = f"<p style='font-size:20px; margin-top:-20px; margin-bottom:-10px; padding:0px;'>Rooming List Validation</p><hr>"
+        st.markdown(rlv, unsafe_allow_html=True)
 
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")

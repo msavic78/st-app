@@ -8,7 +8,8 @@ def update_df_in_session_only(df, df_key, file_path):
     if 'df_changes' not in st.session_state:
         st.session_state.df_changes = df
 
-    st.markdown("Resulting Table")
+    rl_final = f"<p style='color:Green; font-size:20px; margin-bottom:0px; padding:0px;'>Final Rooming List<p><span style='color:#999999;'>Use this Table to Edit & Update Values. Once done, donwload as CSV (hover over the right table corner for more details)</span>"
+    st.markdown(rl_final, unsafe_allow_html=True)
     st.dataframe(st.session_state.df_changes, use_container_width=True, height=200)
 
     # Use st.columns to place inputs on the same row
