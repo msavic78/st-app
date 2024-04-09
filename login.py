@@ -9,6 +9,10 @@ def check_login(username, password):
     # Check if the entered credentials match the correct ones
     return username == correct_username and password == correct_password
 
+# Check session state for login status (avoid Login button double click to submit)
+if 'logged_in' not in st.session_state:
+    st.session_state['logged_in'] = False
+
 # Function to create and manage the login form
 def show_login_form():
     with st.form(key='login_form'):
@@ -20,20 +24,29 @@ def show_login_form():
         rlv = f"<p style='font-size:20px; margin-top:-20px; margin-bottom:-10px; padding:0px;'>Rooming List Validation</p><hr>"
         st.markdown(rlv, unsafe_allow_html=True)
 
+        # Input elements
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
         user_type = st.selectbox("User Type", ["Select", "Admin", "Viewer"], index=0)
         login_button = st.form_submit_button(label="Login")
+
+        # 
+        form_submitted = login_button
+        if 'form_submitted' not in st.session_state:
+             st.session_state["form_submitted"] = False
+        if form_submitted:
+             st.session_state["form_submitted"] = True
         
-        if login_button and user_type != "Select" and check_login(username, password):
-            st.session_state['logged_in'] = True  # Set a session state variable to indicate successful login
-            st.session_state['user_type'] = user_type # Store user type in session state
-            return True
-        elif user_type == "Select":
-                st.error("Please select a user type.")
-        else:
-            st.error("Login Failed. Please check your credentials.")
-            return False
+        if st.session_state["form_submitted"]:
+            if user_type == "Select":
+                 st.error("Please select a user type.")
+            elif user_type != "Select" and check_login(username, password):
+                st.session_state['logged_in'] = True  # Set a session state variable to indicate successful login
+                st.session_state['user_type'] = user_type # Store user type in session state
+                st.experimental_rerun()  # This forces the script to rerun, immediately reflecting the login state
+            else:
+                st.error("Login Failed. Please check your credentials.")
+                return False
 
 
 

@@ -72,52 +72,59 @@ else:
             """,
             unsafe_allow_html=True
         )
+        
+         # Initialize session state if necessary
+        if "expander_open" not in st.session_state:
+            st.session_state.expander_open = True  # Initial state as open
+
+        file_upload_expander = st.expander("Click to view upload options", expanded=st.session_state.expander_open)
+
+        with file_upload_expander:
+            # Load dataframes without displaying them immediately
+            left_file = st.file_uploader("Upload Hotel Rooming List", key="left")
+            right_file = st.file_uploader("Upload ABTSolute Rooming List", key="right")
+        
+        left_df = load_csv(left_file, "Left")
+        right_df = load_csv(right_file, "Right")
 
         # Create placeholders for the original dataframes
         placeholder_left = st.empty()
         placeholder_right = st.empty()
 
-        # Load dataframes without displaying them immediately
-        left_file = st.file_uploader("Upload Hotel Rooming List", key="left")
-        right_file = st.file_uploader("Upload ABTSolute Rooming List", key="right")
-        
-        left_df = load_csv(left_file, "Left")
-        right_df = load_csv(right_file, "Right")
-
-        
-
         # Compare and display differences if both dataframes exist and have the same format
         if left_df is not None and right_df is not None:
+
+            st.session_state.expander_open = False  # Update state to closed
+
             # Clear the placeholders to hide/minimize the original tables
             placeholder_left.empty()
             placeholder_right.empty()
             
             left_df_styled, right_df_styled = compare_dataframes(left_df, right_df)
             
-            left_file_path = "C:\Projects\ABTSolute\Guest List Comparison\RL_hotel.csv"  # Define the file path for the left DataFrame
-            right_file_path = "C:\Projects\ABTSolute\Guest List Comparison\RL_abtsolute.csv"  # Define the file path for the right DataFrame
+            left_file_path = "RL_hotel.csv"  # Define the file path for the left DataFrame
+            right_file_path = "RL_abtsolute.csv"  # Define the file path for the right DataFrame
 
             if left_df_styled is not None:
-                rl_hotel = f"<hr><p style='color:Red; font-size:20px; margin-bottom:0px; padding:0px;'>Hotel Rooming List<p><span style='color:#999999;'>Differences Highlighted in yellow</span>"
+                rl_hotel = f"<br><p style='color:Red; font-size:20px; margin-bottom:0px; padding:0px;'>Hotel Rooming List<p><span style='color:#999999;'>Differences Highlighted in yellow</span>"
                 st.markdown(rl_hotel, unsafe_allow_html=True)
                 st.dataframe(left_df_styled, use_container_width=True)
-                # Insert the editing functionality here for the left table
-                #update_df_in_session_only(left_df, "left", left_file_path)
                 
                 
             if right_df_styled is not None:
                 rl_ABTS = f"<p style='color:Blue; font-size:20px; margin-bottom:0px; padding:0px;'>ABTSolute Rooming List<p><span style='color:#999999;'>Differences Highlighted in yellow</span>"
                 st.markdown(rl_ABTS, unsafe_allow_html=True)
                 st.dataframe(right_df_styled, use_container_width=True)
-                # Insert the editing functionality here for the right table
-                # update_df_in_session_only(right_df, "right", right_file_path)
-
-            #if 'df_changes' in st.session_state:
-                #st.markdown("Updated Table")
-                #st.dataframe(st.session_state.df_changes)
                 
             update_df_in_session_only(left_df, "right", right_file_path)
-
+        
+        # Commented out as there is currently no need to render tables prior to comparison
+        # that is prior to selecting a second table for comparison
+        # I myself like to use triple-quotes to comment out blocks of code while I’m iterating on my app, so I typically do this:
+        # Assigning it to a variable means that it won’t magically be printed
+        # Assigning it to _ (a standard throw-away variable) means that my auto-linters won’t complain about a variable that I’m not using
+        
+        _="""
         else:
             # Only show expanders (with the option to load and display the DFs) if no differences are displayed
             with placeholder_left.container():
@@ -129,6 +136,6 @@ else:
                 if right_df is not None:
                     st.markdown("**ABTSolute Rooming List Original Table**")
                     st.dataframe(right_df, use_container_width=True)
-
+        """
 
 

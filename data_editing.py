@@ -1,7 +1,4 @@
-import base64
-import os
 import streamlit as st
-import pandas as pd
 
 # Function to display a DataFrame and allow cell editing
 def update_df_in_session_only(df, df_key, file_path):
@@ -26,24 +23,9 @@ def update_df_in_session_only(df, df_key, file_path):
             current_value = st.session_state.df_changes.at[row_to_edit, column_to_edit]
             new_value_converted = type(current_value)(new_value)
             st.session_state.df_changes.at[row_to_edit, column_to_edit] = new_value_converted
-            #st.session_state.df_changes.at[row_to_edit, column_to_edit] = new_value
-            #st.session_state.df_changes = df  # Update the session state with the new df
             st.success(f"Value updated successfully: {new_value_converted}")
-
-            # Generate download link after successful save
-            #filename = os.path.basename(file_path)  # Extract filename from path
-            #download_link_html = download_link(st.session_state.df_changes.copy(), filename)
-            #st.markdown(download_link_html, unsafe_allow_html=True)  # Allow HTML for download link
-
-            # st.experimental_rerun();
+            st.experimental_rerun()
 
         except Exception as e:
             st.error(f"Failed to update the value. Error: {e}")
 
-# Download for edited file
-def download_link(df, filename):
-    """Generates a downloadable link for the DataFrame."""
-    csv = df.to_csv(index=False)
-    b64 = base64.b64encode(csv.encode('utf-8')).decode()  # Base64 encode for download
-    href = f"<a href='data:application/octet-stream;base64,{b64}' download='{filename}'>Download {filename}</a>"
-    return href
