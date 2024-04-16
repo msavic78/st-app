@@ -11,6 +11,9 @@ from data_comparison import compare_dataframes
 # Update Table Values Bar
 from data_editing import update_df_in_session_only
 
+# Import filter function for df column cleanup
+from data_loading import filter_columns
+
 
 # Initialize session state
 if 'logged_in' not in st.session_state:
@@ -77,7 +80,7 @@ else:
         if "expander_open" not in st.session_state:
             st.session_state.expander_open = True  # Initial state as open
 
-        file_upload_expander = st.expander("Click to view upload options", expanded=st.session_state.expander_open)
+        file_upload_expander = st.expander("Click to view/hide upload options", expanded=st.session_state.expander_open)
 
         with file_upload_expander:
             # Load dataframes without displaying them immediately
@@ -94,13 +97,17 @@ else:
         # Compare and display differences if both dataframes exist and have the same format
         if left_df is not None and right_df is not None:
 
+            left_df_filtered = filter_columns(left_df)
+            right_df_filtered = filter_columns(right_df)
+
             st.session_state.expander_open = False  # Update state to closed
 
             # Clear the placeholders to hide/minimize the original tables
             placeholder_left.empty()
             placeholder_right.empty()
             
-            left_df_styled, right_df_styled = compare_dataframes(left_df, right_df)
+            # left_df_styled, right_df_styled = compare_dataframes(left_df, right_df)
+            left_df_styled, right_df_styled = compare_dataframes(left_df_filtered, right_df_filtered)
             
             left_file_path = "RL_hotel.csv"  # Define the file path for the left DataFrame
             right_file_path = "RL_abtsolute.csv"  # Define the file path for the right DataFrame
@@ -115,8 +122,9 @@ else:
                 rl_ABTS = f"<p style='color:Blue; font-size:20px; margin-bottom:0px; padding:0px;'>ABTSolute Rooming List<p><span style='color:#999999;'>Differences Highlighted in yellow</span>"
                 st.markdown(rl_ABTS, unsafe_allow_html=True)
                 st.dataframe(right_df_styled, use_container_width=True)
-                
-            update_df_in_session_only(left_df, "right", right_file_path)
+    
+            # Using Hotel column-filtered Rooming List 
+            update_df_in_session_only(left_df_filtered, "right", right_file_path)
         
         # Commented out as there is currently no need to render tables prior to comparison
         # that is prior to selecting a second table for comparison
