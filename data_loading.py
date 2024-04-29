@@ -40,7 +40,8 @@ def filter_columns(df):
     keep_columns = [col for col in df.columns if 
                     "Name" in col or 
                     "Arr" in col or 
-                    "Dep" in col]
+                    "Dep" in col or
+                    "Conf" in col]
 
 
     # Ensure string type in the new columns

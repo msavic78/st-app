@@ -25,12 +25,44 @@ def compare_dataframes(df1, df2):
         def apply_row_highlight_style(row):
             # Check if any cell in the row has '**'
             if any('**' in str(cell) for cell in row):
-                return ['background-color: #f0f0f0' if '**' not in cell else 'background-color: yellow' for cell in row]
+                return ['background-color: #fffbb8' if '**' not in cell else 'background-color: yellow' for cell in row]
             else:
                 return ['' for _ in row]
 
         # Applying styling
-        df1_styled = df1_highlighted.style.applymap(apply_cell_highlight_style).apply(apply_row_highlight_style, axis=1)
-        df2_styled = df2_highlighted.style.applymap(apply_cell_highlight_style).apply(apply_row_highlight_style, axis=1)
+        df1_styled = df1_highlighted.style.applymap(apply_cell_highlight_style).apply(hotelRL_highlighter).apply(apply_row_highlight_style, axis=1)
+        df2_styled = df2_highlighted.style.applymap(apply_cell_highlight_style).apply(ABTSRL_highlighter).apply(apply_row_highlight_style, axis=1)
         
         return df1_styled, df2_styled
+
+
+def normalize_column(df, column_name):
+
+    # Set column type to string and, 
+    df[column_name] = df[column_name].astype(str)
+    df[column_name] = df[column_name].astype(str)
+    
+    # Remove trailing dots
+    df[column_name] = df[column_name].apply(lambda x: x.split('.')[0])
+    return df
+
+def hotelRL_highlighter(row):
+    style_lt = "background-color: #ffffff; color: #8a0700;"
+    return [style_lt for _ in row]
+
+def ABTSRL_highlighter(row):
+    style_lt = "background-color: #ffffff; color: #00008a;"
+    return [style_lt for _ in row]
+
+
+def FinalRL_highlighter(row):
+    style_lt = "background-color: #ffffff; color: #710087;"
+    return [style_lt for _ in row]
+    
+    
+
+
+#def color_negative_red(val):
+#    color = 'red' if val < 0 else 'black'
+#    return 'color: %s' % color
+

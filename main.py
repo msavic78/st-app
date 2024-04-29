@@ -7,6 +7,7 @@ from login import show_login_form
 
 # Compare Dataframes (data_comparison.py)
 from data_comparison import compare_dataframes
+from data_comparison import normalize_column
 
 # Update Table Values Bar
 from data_editing import update_df_in_session_only
@@ -14,6 +15,8 @@ from data_editing import update_df_in_session_only
 # Import filter function for df column cleanup
 from data_loading import filter_columns
 
+# Import Avatar column
+from data_editing import addAvatarColumn
 
 # Initialize session state
 if 'logged_in' not in st.session_state:
@@ -90,6 +93,7 @@ else:
         left_df = load_csv(left_file, "Left")
         right_df = load_csv(right_file, "Right")
 
+
         # Create placeholders for the original dataframes
         placeholder_left = st.empty()
         placeholder_right = st.empty()
@@ -97,8 +101,20 @@ else:
         # Compare and display differences if both dataframes exist and have the same format
         if left_df is not None and right_df is not None:
 
+            # Set Booking Number to String Type
+            #left_df['Conf. #'] = left_df['Conf. #'].astype(str)
+            #right_df['Conf. #'] = right_df['Conf. #'].astype(str)
+
+            # Remove trailing dots from the Booking Number
+            left_df = normalize_column(left_df.copy(), "Conf. #")
+            right_df = normalize_column(right_df.copy(), "Conf. #")
+            
             left_df_filtered = filter_columns(left_df)
             right_df_filtered = filter_columns(right_df)
+            
+            # Add Avatar column
+            # left_df_filtered = addAvatarColumn(left_df_filtered)
+            # right_df_filtered = addAvatarColumn(right_df_filtered)
 
             st.session_state.expander_open = False  # Update state to closed
 
@@ -106,7 +122,6 @@ else:
             placeholder_left.empty()
             placeholder_right.empty()
             
-            # left_df_styled, right_df_styled = compare_dataframes(left_df, right_df)
             left_df_styled, right_df_styled = compare_dataframes(left_df_filtered, right_df_filtered)
             
             left_file_path = "RL_hotel.csv"  # Define the file path for the left DataFrame
@@ -116,12 +131,43 @@ else:
                 rl_hotel = f"<br><p style='color:Red; font-size:20px; margin-bottom:0px; padding:0px;'>Hotel Rooming List<p><span style='color:#999999;'>Differences Highlighted in yellow</span>"
                 st.markdown(rl_hotel, unsafe_allow_html=True)
                 st.dataframe(left_df_styled, use_container_width=True)
+
+                # Render Avatar Column
+                
+                # st.data_editor(
+                #    left_df_styled,
+                #    column_config={
+                #        "Avatar": st.column_config.ImageColumn("Image"),
+                #        "Last Name" : "Last Name",
+                #        "First Name" : "First Name",
+                #        "Arrival" : "Arrival",
+                #        "Departure" : "Departure",
+                #        "Conf. #" : st.column_config.NumberColumn("Conf. #", format="%d") 
+                #    },
+                #    use_container_width=True
+                # )
                 
                 
             if right_df_styled is not None:
                 rl_ABTS = f"<p style='color:Blue; font-size:20px; margin-bottom:0px; padding:0px;'>ABTSolute Rooming List<p><span style='color:#999999;'>Differences Highlighted in yellow</span>"
                 st.markdown(rl_ABTS, unsafe_allow_html=True)
                 st.dataframe(right_df_styled, use_container_width=True)
+
+                # Render Avatar Column
+                
+                # st.data_editor(
+                #    right_df_styled,
+                #    column_config={
+                #        "Avatar": st.column_config.ImageColumn("Image"),
+                #        "Last Name" : "Last Name",
+                #        "First Name" : "First Name",
+                #        "Arrival" : "Arrival",
+                #        "Departure" : "Departure",
+                #        "Conf. #" : st.column_config.NumberColumn("Conf. #", format="%d") 
+                #    },
+                #    use_container_width=True
+                # )
+                
     
             # Using Hotel column-filtered Rooming List 
             update_df_in_session_only(left_df_filtered, "right", right_file_path)
