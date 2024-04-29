@@ -12,7 +12,7 @@ def update_df_in_session_only(df, df_key, file_path):
 
     #st.session_state.df_changes = st.session_state.df_changes.style.apply(FinalRL_highlighter)
 
-    rl_final = f"<p style='color:Green; font-size:20px; margin-bottom:0px; padding:0px;'>Final Rooming List: <span style='color:#710087;'><b>Edit Here</b></span><p><span style='color:#999999;'>Use this Table to Edit & Update Values. Once done, donwload as CSV (hover over the right table corner for more details)</span>"
+    rl_final = f"<p style='color:Green; font-size:20px; margin-bottom:0px; padding:0px;'><b>Final Rooming List</b><p><span style='color:#333333;'>Use this Table to Edit & Update Values. Once done, donwload as CSV (hover over the right table corner for more details)</span>"
     st.markdown(rl_final, unsafe_allow_html=True)
     st.dataframe(st.session_state.df_changes, use_container_width=True, height=200)
 
