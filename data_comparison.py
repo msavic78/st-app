@@ -9,11 +9,23 @@ def compare_dataframes(df1, df2):
         # Highlight differences
         df1_highlighted = df1.copy().astype(str)
         df2_highlighted = df2.copy().astype(str)
+
+        differences = []
         
         for col in df1.columns:
             mask = df1[col].astype(str) != df2[col].astype(str)
             df1_highlighted.loc[mask, col] = '**' + df1[col].astype(str) + '**'
             df2_highlighted.loc[mask, col] = '**' + df2[col].astype(str) + '**'
+
+            # Capture the actual DataFrame indices where differences occur
+            indices = df1.index[mask].tolist()
+            differing_values_df1 = df1.loc[mask, col].tolist()
+            differing_values_df2 = df2.loc[mask, col].tolist()
+
+            for idx, val1, val2 in zip(indices, differing_values_df1, differing_values_df2):
+                differences.append((idx, col, val1, val2))
+
+        display_differences(differences)
         
         # Function to apply cell-specific styling
         def apply_cell_highlight_style(cell_value):
@@ -35,7 +47,7 @@ def compare_dataframes(df1, df2):
         
         return df1_styled, df2_styled
 
-
+# Booking Number Clumn Normalization
 def normalize_column(df, column_name):
 
     # Set column type to string and, 
@@ -45,6 +57,30 @@ def normalize_column(df, column_name):
     # Remove trailing dots
     df[column_name] = df[column_name].apply(lambda x: x.split('.')[0])
     return df
+
+
+def display_differences(differences):
+    """
+    Formats and displays the differences between dataframes in a Streamlit text element.
+
+    Parameters:
+    differences (list of tuples): List containing tuples with (row_idx, col, val1, val2)
+                                  where each tuple represents a difference found between two dataframes.
+    """
+    if differences:  # Check if there are any differences
+        differences_str = "<br>".join(f"<span style='color: #666666;'><b style='color:#000000;'>Row {row_idx}</b>, {col}: {val1} vs {val2}</span>" 
+                                    for row_idx, col, val1, val2 in differences)
+        
+        st.warning('Discrepancies Found', icon="⚠️")
+        st.markdown(f"{differences_str}", unsafe_allow_html=True)
+    else:
+        st.success('No Discrepancies Found', icon="✅")
+
+
+# Example usage:
+# Assuming 'differences' is defined and filled as per your earlier logic
+# display_differences(differences)
+
 
 def hotelRL_highlighter(row):
     style_lt = "background-color: #ffffff; color: #8a0700;"

@@ -2,12 +2,25 @@ import streamlit as st
 
 # Function to check if the login credentials are correct
 def check_login(username, password):
-    # Define the correct credentials
-    correct_username = "abts"
-    correct_password = "abts"
     
-    # Check if the entered credentials match the correct ones
-    return username == correct_username and password == correct_password
+    # Define admin credentials
+    admin_username = "admin"
+    admin_password = "abtsadmin"
+
+    # Define client credentials
+    client_username = "client"
+    client_password = "abts"
+    
+    # If Admin Login
+    if username == admin_username and password == admin_password:
+        return True, "admin"
+ 
+    # If Client Login
+    if username == client_username and password == client_password:
+        return True, "client"
+
+    # if no credentials were provided
+    return False, None
 
 # Check session state for login status (avoid Login button double click to submit)
 if 'logged_in' not in st.session_state:
@@ -27,7 +40,6 @@ def show_login_form():
         # Input elements
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
-        user_type = st.selectbox("User Type", ["Select", "Admin", "Viewer"], index=0)
         login_button = st.form_submit_button(label="Login")
 
         # 
@@ -38,11 +50,10 @@ def show_login_form():
              st.session_state["form_submitted"] = True
         
         if st.session_state["form_submitted"]:
-            if user_type == "Select":
-                 st.error("Please select a user type.")
-            elif user_type != "Select" and check_login(username, password):
+            login_successful, logged_in_as_user_type = check_login(username, password)
+            if (login_successful):
                 st.session_state['logged_in'] = True  # Set a session state variable to indicate successful login
-                st.session_state['user_type'] = user_type # Store user type in session state
+                st.session_state['user_type'] = logged_in_as_user_type # Store user type in session state
                 st.experimental_rerun()  # This forces the script to rerun, immediately reflecting the login state
             else:
                 st.error("Login Failed. Please check your credentials.")

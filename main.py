@@ -1,5 +1,7 @@
+import time
 import streamlit as st
 import pandas as pd
+import os
 
 st.set_page_config(layout="wide")
 
@@ -28,7 +30,8 @@ if not st.session_state['logged_in']: # correct syntax for NOT
     show_login_form()
 else:
 
-    if st.session_state['user_type'] == "Viewer":
+    # CLIENT ROOMSYNC
+    if st.session_state['user_type'] == "client":
 
         # Load Data (data_loading.py)
         from data_loading import load_csv
@@ -48,8 +51,46 @@ else:
 
         left_df = load_csv(left_file, "Left")
 
-    
-    elif st.session_state['user_type'] == "Admin":
+        if left_df is not None:
+
+            # Remove trailing dots from the Booking Number
+            left_df = normalize_column(left_df.copy(), "Conf. #")
+            left_df_filtered = filter_columns(left_df)
+            st.session_state.expander_open = False  # Update state to closed
+            placeholder_left.empty() # Clear the placeholders to hide/minimize the original tables            
+           
+            rl_hotel = f"<br><p style='color:Red; font-size:20px; margin-bottom:0px; padding:0px;'>Hotel Rooming List<p>"
+            st.markdown(rl_hotel, unsafe_allow_html=True)
+            st.dataframe(left_df_filtered, use_container_width=True)
+
+            # Submit button to save the file
+            if st.button('Save to Server'):
+
+                # Use the current working directory
+                upload_folder = 'rl_uploads'
+                save_path = os.path.join(os.getcwd(), upload_folder)  
+                os.makedirs(save_path, exist_ok=True)  # Ensure the directory exists
+
+                file_path = os.path.join(save_path, left_file.name)
+
+                # Ensure the file name is valid and handle common issues
+                if '/' in left_file.name or '\\' in left_file.name:
+                    st.error("File name is invalid. Please ensure it does not contain path characters.")
+                else:
+                    try:
+                        with open(file_path, 'wb') as f:
+                            f.write(left_file.getvalue())
+                        st.success(f'File saved successfully at ' + file_path + '!')
+                        st.success('Rooming list loaded successfully.')
+                    except Exception as e:
+                        st.error(f"Failed to save file: {e}")
+
+            else:
+                msg = st.success('Rooming list loaded successfully.')
+            
+
+    # ADMIN ROOMSYNC
+    elif st.session_state['user_type'] == "admin":
 
          # Load Data (data_loading.py)
         from data_loading import load_csv
@@ -79,16 +120,27 @@ else:
             unsafe_allow_html=True
         )
         
-         # Initialize session state if necessary
+         # Initialize session state(s) if necessary
         if "expander_open" not in st.session_state:
             st.session_state.expander_open = True  # Initial state as open
-
+        
+        # wrap in container
         file_upload_expander = st.expander("Click to view/hide upload options", expanded=st.session_state.expander_open)
 
         with file_upload_expander:
+            
             # Load dataframes without displaying them immediately
             left_file = st.file_uploader("Upload Hotel Rooming List", key="left")
             right_file = st.file_uploader("Upload ABTSolute Rooming List", key="right")
+            
+            # If the state change were set to occur on the second file upload, 
+            # the state would indeed update. However, the code would continue to line 142, 
+            # effectively using the previous session state to determine the expander's behavior. 
+            # This is because the code execution would not return to re-render 
+            # the expander with the updated state.
+            if left_file is not None:
+                st.session_state.expander_open = False
+
         
         left_df = load_csv(left_file, "Left")
         right_df = load_csv(right_file, "Right")
@@ -100,6 +152,8 @@ else:
 
         # Compare and display differences if both dataframes exist and have the same format
         if left_df is not None and right_df is not None:
+            
+
 
             # Set Booking Number to String Type
             #left_df['Conf. #'] = left_df['Conf. #'].astype(str)
@@ -116,7 +170,6 @@ else:
             # left_df_filtered = addAvatarColumn(left_df_filtered)
             # right_df_filtered = addAvatarColumn(right_df_filtered)
 
-            st.session_state.expander_open = False  # Update state to closed
 
             # Clear the placeholders to hide/minimize the original tables
             placeholder_left.empty()
