@@ -30,14 +30,14 @@ def compare_dataframes(df1, df2):
         # Function to apply cell-specific styling
         def apply_cell_highlight_style(cell_value):
             if '**' in cell_value:
-                return 'background-color: yellow'
+                return 'background-color: red; color:#333333 !important;'
             return ''
 
         # Function to apply row-specific styling based on cell condition
         def apply_row_highlight_style(row):
             # Check if any cell in the row has '**'
             if any('**' in str(cell) for cell in row):
-                return ['background-color: #fffbb8' if '**' not in cell else 'background-color: yellow' for cell in row]
+                return ['background-color: #fffbb8;color:#333333;' if '**' not in cell else 'background-color: yellow; color:#000000;' for cell in row]
             else:
                 return ['' for _ in row]
 
@@ -47,7 +47,7 @@ def compare_dataframes(df1, df2):
         
         return df1_styled, df2_styled
 
-# Booking Number Clumn Normalization
+# Booking Number Column Normalization
 def normalize_column(df, column_name):
 
     # Set column type to string and, 
@@ -68,26 +68,22 @@ def display_differences(differences):
                                   where each tuple represents a difference found between two dataframes.
     """
     if differences:  # Check if there are any differences
-        differences_str = "<br>".join(f"<span style='color: #666666;'><b style='color:#000000;'>Row {row_idx}</b>, {col}: {val1} vs {val2}</span>" 
+        differences_str = "<br>".join(f"<span style='color: #BC8313;'><b style='color:red;'>Row {row_idx}</b>, {col}: {val1} vs {val2}</span>" 
                                     for row_idx, col, val1, val2 in differences)
         
-        st.warning('Discrepancies Found', icon="⚠️")
-        st.markdown(f"{differences_str}", unsafe_allow_html=True)
+        with st.expander("Show/Hide rooming list discrepancies"):
+            st.warning('Discrepancies Found', icon="⚠️")
+            st.markdown(f"<p style='zborder:1px solid #eeeeee; border-radius:10px; padding:10px;background-color:#FFFCE7'>{differences_str}</p>", unsafe_allow_html=True)
     else:
         st.success('No Discrepancies Found', icon="✅")
 
 
-# Example usage:
-# Assuming 'differences' is defined and filled as per your earlier logic
-# display_differences(differences)
-
-
 def hotelRL_highlighter(row):
-    style_lt = "background-color: #ffffff; color: #8a0700;"
+    style_lt = "background-color: #ffffff; color: #fcc0c0;"
     return [style_lt for _ in row]
 
 def ABTSRL_highlighter(row):
-    style_lt = "background-color: #ffffff; color: #00008a;"
+    style_lt = "background-color: #ffffff; color: #c0c6fc;"
     return [style_lt for _ in row]
 
 

@@ -1,22 +1,26 @@
+from datetime import datetime
+from flask import request
+import os
 import streamlit as st
+
 
 # Function to check if the login credentials are correct
 def check_login(username, password):
     
     # Define admin credentials
     admin_username = "admin"
-    admin_password = "abtsadmin"
+    admin_password = "2000Albatros"
 
     # Define client credentials
     client_username = "client"
-    client_password = "abts"
+    client_password = "RoomSync2024!!"
     
     # If Admin Login
     if username == admin_username and password == admin_password:
         return True, "admin"
  
     # If Client Login
-    if username == client_username and password == client_password:
+    if password == client_password:
         return True, "client"
 
     # if no credentials were provided
@@ -54,12 +58,52 @@ def show_login_form():
             if (login_successful):
                 st.session_state['logged_in'] = True  # Set a session state variable to indicate successful login
                 st.session_state['user_type'] = logged_in_as_user_type # Store user type in session state
+                
+                # If login is specifically a client, log the username
+                if logged_in_as_user_type == "client":
+                    
+                     # Get the IP address
+                    if 'client_ip' not in st.session_state:
+                        st.session_state['client_ip'] = get_client_ip() 
+                        client_ip = st.session_state['client_ip']
+
+                    log_client_login(username, client_ip) 
+                
                 st.experimental_rerun()  # This forces the script to rerun, immediately reflecting the login state
+
             else:
                 st.error("Login Failed. Please check your credentials.")
                 return False
 
+# Function to log client logins
+def log_client_login(username, client_ip):
+    # Get the script's directory (application root)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
 
+    # Create the logs directory if it doesn't exist
+    logs_dir = os.path.join(current_dir, 'logs')
+    os.makedirs(logs_dir, exist_ok=True)
+
+    # Log file path
+    log_file_path = os.path.join(logs_dir, 'client_logins.log')
+
+    # Open the file in append mode and write the log entry
+    with open(log_file_path, 'a') as f:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        f.write(f"{timestamp} - Client login: {username} (IP: {client_ip})\n")
+
+def get_client_ip():
+    try: 
+        # Check for forwarded IP if behind proxy/load balancer
+        if 'X-Forwarded-For' in request.headers:
+            return request.headers['X-Forwarded-For'].split(',')[0]
+        else:
+            return request.remote_addr
+    except:
+        return None
+    
+
+    
 
 """
 DATABASE LOGIN (PENDING ABTSolute connection)

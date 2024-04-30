@@ -152,8 +152,6 @@ else:
 
         # Compare and display differences if both dataframes exist and have the same format
         if left_df is not None and right_df is not None:
-            
-
 
             # Set Booking Number to String Type
             #left_df['Conf. #'] = left_df['Conf. #'].astype(str)
