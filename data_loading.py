@@ -1,18 +1,33 @@
 # data_loading.py
+import os
 import pandas as pd
 import io
 import streamlit as st
 
-def load_csv(file_uploader, side):
-    """Load data from a CSV or Excel file.
+from data_comparison import normalize_column
 
-    Args:
-        file_uploader (UploadedFile): The uploaded file object from Streamlit.
+# Loads a CSV or Excel file from a Streamlit file uploader widget.
+def load_csv(file_uploader, uploaded_key):
+    
+    if file_uploader is not None and uploaded_key == "viaPath":
+        # Get the file name and extension
+        file_name = file_uploader.strip()
+        try:
+            
+            # Get the file extension
+            _, file_extension = os.path.splitext(file_name)
 
-    Returns:
-        pd.DataFrame: The loaded data as a DataFrame, or None if loading fails.
-    """
-    if file_uploader is not None:
+            if file_name.endswith('.csv'):
+                return pd.read_csv(file_uploader, encoding='ISO-8859-1', on_bad_lines='skip')
+            elif file_name.endswith('.xlsx'):
+                return pd.read_excel(file_uploader)
+            else: # Handling unsupported file types
+                st.error("File type not supported. Please upload a CSV or Excel file.")
+                return None
+        except Exception as e:
+            st.error(f"Error processing the file: {e}")
+
+    if file_uploader is not None and uploaded_key == "viaUploader":
         file_name = file_uploader.name
         bytes_data = file_uploader.read()  # Read file contents
         try:
@@ -27,6 +42,12 @@ def load_csv(file_uploader, side):
             st.error(f"Error processing the file: {e}")
     return None
 
+def load_and_process_data(file, key):
+    df = load_csv(file, key)
+    if df is not None:
+        df = normalize_column(df.copy(), "Conf. #")
+        df = filter_columns(df)
+    return df
 
 def filter_columns(df):
 
@@ -50,8 +71,6 @@ def filter_columns(df):
 
     # Filter and return the modified DataFrame
     return df[keep_columns]
-
-import pandas as pd
 
 def split_name_column(df, column_name="Name"):
     """Detects a single 'Name' column, splits it into 'First Name' and 'Last Name', and updates the DataFrame.

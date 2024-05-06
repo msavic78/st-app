@@ -1,6 +1,9 @@
 # data_comparison.py
 import streamlit as st
 
+# Find a way to hide/show dataframe rows that are not different by clicking a button
+# Add #EEEEEE to every second row in the dataframe
+
 def compare_dataframes(df1, df2):
     if not df1.columns.equals(df2.columns):
         st.error("The files do not have the same format (columns differ).")

@@ -32,7 +32,7 @@ def update_df_in_session_only(df, df_key, file_path):
             st.session_state.df_changes.at[row_to_edit, column_to_edit] = new_value_converted
             #st.session_state.df_changes = st.session_state.df_changes.style.apply(FinalRL_highlighter)
             st.success(f"Value updated successfully: {new_value_converted}")
-            st.experimental_rerun()
+            st.rerun()
 
         except Exception as e:
             st.error(f"Failed to update the value. Error: {e}")

@@ -1,19 +1,31 @@
 from datetime import datetime
+import re
 from flask import request
 import os
 import streamlit as st
 
 
+# Regex pattern for validating an email
+EMAIL_REGEX = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+
+def setClientEmail(email):
+    st.session_state['client_email'] = email
+
+def getClientEmail():
+    current_time = datetime.now().strftime('%Y-%m-%d %H-%M-%S')  # Format datetime as string
+    return st.session_state['client_email'] + ' - ' + current_time + ' '
+
 # Function to check if the login credentials are correct
 def check_login(username, password):
-    
+
     # Define admin credentials
-    admin_username = "admin"
-    admin_password = "2000Albatros"
+    admin_username = "admin@abtscs.com"
+    # admin_password = "2000Albatros"
+    admin_password = "a"
 
     # Define client credentials
-    client_username = "client"
-    client_password = "RoomSync2024!!"
+    # client_password = "RoomSync2024!!"
+    client_password = "a"
     
     # If Admin Login
     if username == admin_username and password == admin_password:
@@ -42,38 +54,52 @@ def show_login_form():
         st.markdown(rlv, unsafe_allow_html=True)
 
         # Input elements
-        username = st.text_input("Username")
+        username = st.text_input("Email")
         password = st.text_input("Password", type="password")
         login_button = st.form_submit_button(label="Login")
 
-        # 
+        # What?
         form_submitted = login_button
+
         if 'form_submitted' not in st.session_state:
              st.session_state["form_submitted"] = False
         if form_submitted:
              st.session_state["form_submitted"] = True
         
         if st.session_state["form_submitted"]:
-            login_successful, logged_in_as_user_type = check_login(username, password)
-            if (login_successful):
-                st.session_state['logged_in'] = True  # Set a session state variable to indicate successful login
-                st.session_state['user_type'] = logged_in_as_user_type # Store user type in session state
+
+            # Email validation message
+            if is_valid_email(username):
+
+                login_successful, logged_in_as_user_type = check_login(username, password)
                 
-                # If login is specifically a client, log the username
-                if logged_in_as_user_type == "client":
+                if (login_successful):
                     
-                     # Get the IP address
-                    if 'client_ip' not in st.session_state:
-                        st.session_state['client_ip'] = get_client_ip() 
-                        client_ip = st.session_state['client_ip']
+                    st.session_state['logged_in'] = True  # Set a session state variable to indicate successful login
+                    st.session_state['user_type'] = logged_in_as_user_type # Store user type in session state
+                    # If login is specifically a client, log the username
+                    if logged_in_as_user_type == "client":
 
-                    log_client_login(username, client_ip) 
-                
-                st.experimental_rerun()  # This forces the script to rerun, immediately reflecting the login state
+                        # Save client email to a session that can be distributed to other classes
+                        setClientEmail(username)    
 
+                        # Get the IP address
+                        if 'client_ip' not in st.session_state:
+                            st.session_state['client_ip'] = get_client_ip() 
+                            client_ip = st.session_state['client_ip']
+
+                        log_client_login(username, client_ip) 
+                    
+                    st.experimental_rerun()  # This forces the script to rerun, immediately reflecting the login state
+
+                else:
+                    st.error("Login Failed. Please check your credentials.")
+                    return False
+            
+            # Reject if username is not an email
             else:
-                st.error("Login Failed. Please check your credentials.")
-                return False
+                st.error("This is not a valid email. Please enter a valid email address.")
+
 
 # Function to log client logins
 def log_client_login(username, client_ip):
@@ -102,7 +128,9 @@ def get_client_ip():
     except:
         return None
     
-
+def is_valid_email(email):
+    #Check if the provided string matches the email regex pattern.
+    return re.match(EMAIL_REGEX, email) is not None
     
 
 """
