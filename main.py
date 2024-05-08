@@ -1,4 +1,5 @@
 # Standard library imports
+import time
 import os
 
 # Related third party imports
@@ -95,7 +96,7 @@ else:
                 col1, col2 = st.columns(2)
 
                 # Prompt the user for the conference and hotel names
-                conference_name = col1.text_input("Enter the conference name:")
+                conference_name = col1.selectbox('Select a conference', ['AAD', 'AAN', 'AAOS', 'ADA', 'ASBMR'])
                 hotel_name = col2.text_input("Enter the hotel name:")
 
                  # Add a confirm button
@@ -111,7 +112,14 @@ else:
 
                         # Add email and timestamp (exclude minutes and seconds later on)
                         filestamp = getClientEmail()
-                        file_path = os.path.join(save_path, filestamp + hotel_name + left_file.name)
+
+                        # Get the extension of the file
+                        _, extension = os.path.splitext(left_file.name)
+
+                        file_path = os.path.join(save_path, filestamp + hotel_name + extension)
+
+                        # Create a placeholder for the success message
+                        success_message = st.empty()
 
                         # Ensure the file name is valid and handle common issues
                         if '/' in left_file.name or '\\' in left_file.name:
@@ -120,9 +128,11 @@ else:
                             try:
                                 with open(file_path, 'wb') as f:
                                     f.write(left_file.getvalue())
-                                st.success(f'File saved successfully at ' + file_path + '!')
-                                st.success('Rooming list loaded successfully.')
-                                st.rerun()
+                                #st.success(f'File saved successfully at ' + file_path + '!')
+                                success_message.success(f'{hotel_name} - Rooming List saved successfully')
+                                time.sleep(5)
+                                success_message.empty()
+                                # st.rerun()
                             except Exception as e:
                                 st.error(f"Failed to save file: {e}")
 

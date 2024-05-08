@@ -15,7 +15,11 @@ def save_file_to_server(file):
 
     # Add email and timestamp (exclude minutes and seconds later on)
     filestamp = getClientEmail()
-    file_path = os.path.join(save_path, filestamp + file.name)
+
+     # Get the extension of the file
+    _, extension = os.path.splitext(file.name)
+
+    file_path = os.path.join(save_path, filestamp + extension)
 
     # Ensure the file name is valid and handle common issues
     if '/' in file.name or '\\' in file.name:
