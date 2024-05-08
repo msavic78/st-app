@@ -23,7 +23,7 @@ def display_header():
 
     # Add a hidden Streamlit button in the sidebar
     logout_clicked = st.sidebar.button("Log out", key="logout_button")
-
+    
     # If the hidden Streamlit button was clicked, clear the session state and rerun the app
     if logout_clicked:
         st.session_state.clear()
