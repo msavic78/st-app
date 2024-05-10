@@ -12,7 +12,7 @@ from data_comparison import compare_dataframes, normalize_column
 from data_editing import addAvatarColumn, update_df_in_session_only
 from data_loading import filter_columns, load_and_process_data
 from login import getClientEmail, show_login_form
-from ui import change_label_style, display_header, display_title, display_rooming_list_validation, display_hotel_rooming_list
+from ui import change_label_style, display_header, display_title, display_rooming_list_validation, display_hotel_rooming_list, resizeSidebar
 from styles import get_css
 
 st.set_page_config(layout="wide")
@@ -58,7 +58,7 @@ else:
 
         with st.expander("Upload Rooming List", expanded=True):
 
-            left_file = st.file_uploader("Upload Hotel Rooming List", key="left")
+            left_file = st.file_uploader("Upload Client Rooming List", key="left")
             left_df = load_and_process_data(left_file, "viaUploader")
 
         # Using Hotel column-filtered Rooming List
@@ -179,7 +179,7 @@ else:
             
             # Load dataframes without displaying them immediately
             #left_file = st.file_uploader("Upload Hotel Rooming List", key="left")
-            right_file = st.file_uploader("Upload Hotel Rooming List", key="right")
+            right_file = st.file_uploader("Upload Client Rooming List", key="right")
 
             # If the state change were set to occur on the second file upload, 
             # the state would indeed update. However, the code would continue to line 142, 
