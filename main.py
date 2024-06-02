@@ -12,7 +12,7 @@ from data_comparison import compare_dataframes, normalize_column
 from data_editing import addAvatarColumn, update_df_in_session_only
 from data_loading import filter_columns, load_and_process_data
 from login import getClientEmail, show_login_form
-from ui import change_label_style, display_header, display_title, display_rooming_list_validation, display_hotel_rooming_list, resizeSidebar
+from ui import change_label_style, display_header, display_title, display_rooming_list_validation, display_hotel_rooming_list
 from styles import get_css
 
 st.set_page_config(layout="wide")
