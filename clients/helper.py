@@ -31,3 +31,26 @@ def save_file_to_server(file):
             st.success("File saved successfully.")
         except Exception as e:
             st.error(f"An error occurred: {e}")
+
+# Function to hide rows in a DataFrame
+def hide_rows(df, rows_to_hide):
+    """
+    This function hides selected rows from a DataFrame.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame from which to hide rows.
+    rows_to_hide (list): The list of row indices to hide.
+
+    Returns:
+    pd.DataFrame: The DataFrame with the selected rows hidden.
+    """
+    df_hidden_rows = df.drop(rows_to_hide)
+    return df_hidden_rows
+
+def hide_identical_rows(checkbox, in_df_style, same_rows):
+    in_df = in_df_style.data
+    if checkbox:
+            in_df= hide_rows(in_df, same_rows)
+            return in_df.style
+    else:
+        return in_df_style

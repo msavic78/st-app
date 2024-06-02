@@ -2,9 +2,10 @@
 
 import streamlit as st
 
+# Check which pages actually use this (i.e. login and main.py do not use this)
 def init_markup():
     header = st.container()
-    title=f"<h3 style='color:#3C8595;'>ABTS <span style='color:#333333;'>RoomSync</span></h3>"
+    title=f"<h3 style='color:#3C8595;'>ABTS <span style='color:#333333;'>RoomSynce</span></h3>"
     header.write(title, unsafe_allow_html=True)
     rlv = f"<p style='font-size:20px; margin-top:-20px; margin-bottom:-10px; padding:0px;'>Rooming List Validation</p>"
     header.write(rlv, unsafe_allow_html=True)
@@ -27,3 +28,4 @@ def init_markup():
         """,
         unsafe_allow_html=True
     )
+

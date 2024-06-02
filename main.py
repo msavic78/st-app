@@ -8,6 +8,7 @@ import streamlit as st
 
 # Local application/library specific imports
 from clients.form import show_files
+from clients.helper import hide_identical_rows, hide_rows
 from data_comparison import compare_dataframes, normalize_column
 from data_editing import addAvatarColumn, update_df_in_session_only
 from data_loading import filter_columns, load_and_process_data
@@ -240,7 +241,14 @@ else:
             if right_df_styled is not None:
                 rl_ABTS = f"<p style='color:Blue; font-size:20px; margin-bottom:0px; padding:0px;'>ABTSolute Rooming List<p><span style='color:#999999;'>Differences Highlighted in yellow</span>"
                 st.markdown(rl_ABTS, unsafe_allow_html=True)
-                st.dataframe(right_df_styled, use_container_width=True)
+
+                # Hide identical rows
+                hide_ABTSolute_rows_checkbox = st.checkbox("Hide identical rows", key="hide_ABTSolute_rows")
+                right_df_styled = hide_identical_rows(hide_ABTSolute_rows_checkbox, right_df_styled, st.session_state['same_rows'])
+
+                # load DF into streamlit container
+                ABTSolute_df_height = min(len(right_df_styled.data) * 44, 300)
+                st.dataframe(right_df_styled, use_container_width=True,  height=ABTSolute_df_height) # set dataframe attributes (height, width, etc.)
 
                 # Render Avatar Column
                 
@@ -260,7 +268,16 @@ else:
             if left_df_styled is not None:
                 rl_hotel = f"<br><p style='color:Red; font-size:20px; margin-bottom:0px; padding:0px;'>Hotel Rooming List<p><span style='color:#999999;'>Differences Highlighted in yellow</span>"
                 st.markdown(rl_hotel, unsafe_allow_html=True)
-                st.dataframe(left_df_styled, use_container_width=True)
+                
+                # Hide identical rows
+                hide_hotel_rows_checkbox = st.checkbox("Hide identical rows", key="hide_hotel_rows")
+                left_df_styled = hide_identical_rows(hide_hotel_rows_checkbox, left_df_styled, st.session_state['same_rows'])
+                
+                # load DF into streamlit container
+                rl_hotel_df_height = min(len(left_df_styled.data) * 44, 300)  # calculate the height based on the number of rows
+                st.dataframe(left_df_styled, use_container_width=True, height=rl_hotel_df_height) # set dataframe attributes (height, width, etc.)
+
+           
 
                 # Render Avatar Column
                 

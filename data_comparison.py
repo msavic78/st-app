@@ -1,10 +1,17 @@
 # data_comparison.py
 import streamlit as st
 
+
+
 # Find a way to hide/show dataframe rows that are not different by clicking a button
 # Add #EEEEEE to every second row in the dataframe
 
 def compare_dataframes(df1, df2):
+
+     # Get the current session state
+    if 'same_rows' not in st.session_state:
+        st.session_state['same_rows'] = []
+
     if not df1.columns.equals(df2.columns):
         st.error("The files do not have the same format (columns differ).")
         return None, None
@@ -24,6 +31,13 @@ def compare_dataframes(df1, df2):
             indices = df1.index[mask].tolist()
             differing_values_df1 = df1.loc[mask, col].tolist()
             differing_values_df2 = df2.loc[mask, col].tolist()
+
+            # Get the indices of the rows that are the same across all columns
+            mask2 = (df1 == df2).all(axis=1)
+            same_indices = df1.index[mask2].tolist()
+            
+            # Store the indices in the session state
+            st.session_state['same_rows'] = same_indices
 
             for idx, val1, val2 in zip(indices, differing_values_df1, differing_values_df2):
                 differences.append((idx, col, val1, val2))
