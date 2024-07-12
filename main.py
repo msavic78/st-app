@@ -69,7 +69,6 @@ else:
         if left_df is not None:
 
             # CHECK OUT THE HELPER FUNCTION IN THE FORM.PY and see if it can be used here
-
             # Create placeholders for the original dataframes
                         
             # Remove trailing dots from the Booking Number
@@ -179,7 +178,6 @@ else:
         with file_upload_expander:
             
             # Load dataframes without displaying them immediately
-            #left_file = st.file_uploader("Upload Hotel Rooming List", key="left")
             right_file = st.file_uploader("Upload Client Rooming List", key="right")
 
             # If the state change were set to occur on the second file upload, 
@@ -202,7 +200,6 @@ else:
         else:
             left_df = load_csv(st.session_state.file_path, "viaPath") 
         
-        #left_df = load_csv(left_file, "viaUploader") 
         right_df = load_csv(right_file, "viaUploader")
 
 
@@ -213,11 +210,7 @@ else:
         # Compare and display differences if both dataframes exist and have the same format
         if left_df is not None and right_df is not None:
 
-            # Set Booking Number to String Type
-            #left_df['Conf. #'] = left_df['Conf. #'].astype(str)
-            #right_df['Conf. #'] = right_df['Conf. #'].astype(str)
-
-            # Remove trailing dots from the Booking Number
+                  # Remove trailing dots from the Booking Number
             left_df = normalize_column(left_df.copy(), "Conf. #")
             right_df = normalize_column(right_df.copy(), "Conf. #")
             
@@ -233,6 +226,7 @@ else:
             placeholder_left.empty()
             placeholder_right.empty()
             
+            # Compare the dataframes
             left_df_styled, right_df_styled = compare_dataframes(left_df_filtered, right_df_filtered)
             
             left_file_path = "RL_hotel.csv"  # Define the file path for the left DataFrame

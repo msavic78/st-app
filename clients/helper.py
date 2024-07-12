@@ -47,6 +47,7 @@ def hide_rows(df, rows_to_hide):
     df_hidden_rows = df.drop(rows_to_hide)
     return df_hidden_rows
 
+# Function to hide identical rows
 def hide_identical_rows(checkbox, in_df_style, same_rows):
     in_df = in_df_style.data
     if checkbox:

@@ -9,7 +9,7 @@
             "type": "debugpy",
             "request": "launch",
             "module": "streamlit",
-            "python": "C:\\Users\\m_sav\\anaconda3\\envs\\roomsync\\python.exe",
+            "python": "C:\\Users\\IT\\anaconda3\\envs\\roomsync\\python.exe",
             "args": [
                 "run",
                 "main.py"

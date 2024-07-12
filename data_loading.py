@@ -50,6 +50,9 @@ def load_and_process_data(file, key):
     return df
 
 def filter_columns(df):
+    
+    # Rename columns by stripping leading/trailing whitespaces
+    df = df.rename(columns=lambda x: x.strip())
 
      # Count columns containing "Name" (case-insensitive)
     name_column_count = sum(col.lower().find("name") != -1 for col in df.columns)
@@ -66,8 +69,10 @@ def filter_columns(df):
 
 
     # Ensure string type in the new columns
+    df.columns = df.columns.str.strip()
     df['First Name'] = df['First Name'].astype(str)
     df['Last Name'] = df['Last Name'].astype(str)
+
 
     # Filter and return the modified DataFrame
     return df[keep_columns]
@@ -93,4 +98,6 @@ def split_name_column(df, column_name="Name"):
         df_cleared = df.rename(columns={"Arr.": "Arrival", "Dep.": "Departure"}, inplace=True)
 
     return df_cleared
+
+
 

@@ -6,18 +6,14 @@ from PIL import Image
 
 # Function to display a DataFrame and allow cell editing
 def update_df_in_session_only(df, df_key, file_path):
-    
     if 'df_changes' not in st.session_state:
-        st.session_state.df_changes = df
+        st.session_state.df_changes = df.copy()
 
-    #st.session_state.df_changes = st.session_state.df_changes.style.apply(FinalRL_highlighter)
-
-    rl_final = f"<p style='color:Green; font-size:20px; margin-bottom:0px; padding:0px;'><b>Final Rooming List</b><p><span style='color:#333333;'>Use this Table to Edit & Update Values. Once done, donwload as CSV (hover over the right table corner for more details)</span>"
+    rl_final = f"<p style='color:Green; font-size:20px; margin-bottom:0px; padding:0px;'><b>Final Rooming List</b><p><span style='color:#333333;'>Use this Table to Edit & Update Values. Once done, download as CSV (hover over the right table corner for more details)</span>"
     st.markdown(rl_final, unsafe_allow_html=True)
     st.dataframe(st.session_state.df_changes, use_container_width=True, height=200)
 
-    # Use st.columns to place inputs on the same row
-    col1, col2, col3 = st.columns(3)  # Create three columns
+    col1, col2, col3 = st.columns(3)
     with col1:
         row_to_edit = st.number_input("Enter the row index to edit:", min_value=0, max_value=len(df)-1, key=f"row_{df_key}")
     with col2:
@@ -30,12 +26,18 @@ def update_df_in_session_only(df, df_key, file_path):
             current_value = st.session_state.df_changes.at[row_to_edit, column_to_edit]
             new_value_converted = type(current_value)(new_value)
             st.session_state.df_changes.at[row_to_edit, column_to_edit] = new_value_converted
-            #st.session_state.df_changes = st.session_state.df_changes.style.apply(FinalRL_highlighter)
-            st.success(f"Value updated successfully: {new_value_converted}")
-            st.rerun()
-
+            st.session_state['update_attempted'] = True
+            st.session_state['update_success'] = True
+            st.session_state['update_success_value'] = new_value_converted + "  [ROW: " + str(row_to_edit) + ", COL: " + str(column_to_edit) + "]"
+            st.experimental_rerun()  # Force Streamlit to rerun the script to reflect the changes immediately
         except Exception as e:
+            st.session_state['update_attempted'] = True
             st.error(f"Failed to update the value. Error: {e}")
+
+    # Moved the success message here to ensure it appears below the "Apply Changes" button
+    if 'update_success' in st.session_state:
+        st.success(f"Value updated successfully: {st.session_state['update_success_value']}")
+        del st.session_state['update_success']
 
 def addAvatarColumn(df):
     
@@ -81,6 +83,7 @@ def pil_to_html(pil_img):
 
 def path_to_image_html(path):
     return '<img src="' + path +'" width="60" >'
+
 
 
 
